@@ -1,3 +1,3 @@
 export interface userInfo {
-  username: string
+  username: string | null
 }

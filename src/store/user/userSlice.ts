@@ -3,7 +3,7 @@ import { type userInfo } from './userType'
 
 // 默认值
 const initialState: userInfo = {
-  username: ''
+  username: null
 }
 
 export const userSlice = createSlice({
@@ -11,12 +11,12 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     // 登录
-    login: (state, action) => {
+    setUserName: (state, action) => {
       state.username = action.payload
     }
   }
 })
 
-export const { login } = userSlice.actions
+export const { setUserName } = userSlice.actions
 
 export default userSlice.reducer
