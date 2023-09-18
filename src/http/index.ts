@@ -20,6 +20,7 @@ export async function request<T = any, D = any> (config: AxiosRequestConfig<D>):
     const { ...restConfig } = config
     requestInstance.request({
       ...restConfig,
+      // GET参数序列化
       paramsSerializer (params: any): string {
         return qs.stringify(params)
       }
