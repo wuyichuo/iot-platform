@@ -1,20 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { type userInfo } from './userType'
 
+// 默认值
 const initialState: userInfo = {
   username: ''
 }
 
-export const counterSlice = createSlice({
-  name: 'counter',
+export const userSlice = createSlice({
+  name: 'userInfo',
   initialState,
   reducers: {
+    // 登录
     login: (state, action) => {
       state.username = action.payload
     }
   }
 })
 
-export const { login } = counterSlice.actions
+export const { login } = userSlice.actions
 
-export default counterSlice.reducer
+export default userSlice.reducer

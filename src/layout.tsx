@@ -7,26 +7,26 @@ import {
   MenuFoldOutlined
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { Breadcrumb, Button, Layout, Menu, theme } from 'antd'
+import { Button, Layout, Menu } from 'antd'
 
-const { Header, Content, Footer, Sider } = Layout
+const { Header, Content, Sider } = Layout
 
+// 定义导航菜单元素
 type MenuItem = Required<MenuProps>['items'][number]
 
 function getItem (
   label: React.ReactNode,
   key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[]
+  icon?: React.ReactNode
 ): MenuItem {
   return {
     key,
     icon,
-    children,
     label
   } satisfies MenuItem
 }
 
+// 导航选项
 const items: MenuItem[] = [
   getItem('主页', 'Home', <HomeOutlined />),
   getItem('数据展示', 'Data', <PieChartOutlined />),
@@ -34,11 +34,9 @@ const items: MenuItem[] = [
 ]
 
 const App: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false)
-  const {
-    token: { colorBgContainer }
-  } = theme.useToken()
+  const [collapsed, setCollapsed] = useState(false) // 导航栏是否展开
 
+  // DOM
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ padding: 0 }} >
@@ -72,7 +70,7 @@ const App: React.FC = () => {
           />
         </Sider>
         <Content style={{ height: '100%', width: '100%' }}>
-          <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
+          <div style={{ padding: 24, minHeight: 360, backgroundColor: '#fff' }}>
             Bill is a cat.
           </div>
         </Content>
