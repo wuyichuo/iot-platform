@@ -1,8 +1,9 @@
-import { useRoutes } from 'react-router-dom'
-import AppRoutes from './routes'
+import AppRoutes from './router/routes'
+import { RouterGuard } from './router/routerGuard'
 
 function App (): React.ReactElement {
-  return useRoutes(AppRoutes) as React.ReactElement
+  // 路由守卫
+  return <RouterGuard routes={AppRoutes}></RouterGuard>
 }
 
 export default App

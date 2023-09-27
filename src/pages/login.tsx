@@ -2,16 +2,20 @@ import React from 'react'
 import { Select } from 'antd'
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks'
 import { setUserName } from '@/store/user/userSlice'
+import { useNavigate } from 'react-router-dom'
 
 const USERS = ['字节跳动', '华为', '阿里巴巴', '腾讯']
 
 const App: React.FC = () => {
   const { username } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   // 用户登录
   const Login = (username: string): void => {
     dispatch(setUserName(username))
+    // 跳转到首页
+    navigate('/')
   }
 
   return (
