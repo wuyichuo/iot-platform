@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import AMapLoader from '@amap/amap-jsapi-loader'
-import { useLocation } from 'react-router-dom'
 
 //   测试数据
 const markData = [
@@ -34,14 +33,9 @@ const markData = [
 ]
 
 const MapContainer: React.FC = () => {
-  const mapHeight = document.body.clientHeight - 64 // 地图高度
-  // 当前路径
-  const location = useLocation()
-  const { pathname } = location
-
-  let map: any = null // 地图实例
-
   useEffect(() => {
+    // 地图实例
+    let map: any = null
     // 加载地图
     AMapLoader.load({
       key: '0c925ab02fe8ea3590803c230d2df8a5', // 高德地图Web端开发者Key
@@ -71,17 +65,14 @@ const MapContainer: React.FC = () => {
       .catch((e) => {
         console.log(e)
       })
+    // 销毁地图实例
+    return () => {
+      map?.destroy()
+    }
   }, [])
 
-  // 销毁地图实例
-  useEffect(() => {
-    if (map !== null && pathname !== '/home') {
-      map.destroy()
-    }
-  }, [pathname])
-
   return (
-    <div id="container" style={{ width: '100%', height: mapHeight }}></div>
+    <div id="container" style={{ width: '100%', height: 'calc(100vh - 64px)' }}></div>
   )
 }
 
