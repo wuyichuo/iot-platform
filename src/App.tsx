@@ -1,14 +1,8 @@
-import { Provider } from 'react-redux'
-import { store } from '@/store/store'
-import Layout from './layout'
-import Login from '@/pages/login'
+import { useRoutes } from 'react-router-dom'
+import AppRoutes from './routes'
 
-function App (): JSX.Element {
-  return (
-    <Provider store={store}>
-      < Login />
-    </Provider>
-  )
+function App (): React.ReactElement {
+  return useRoutes(AppRoutes) as React.ReactElement
 }
 
 export default App

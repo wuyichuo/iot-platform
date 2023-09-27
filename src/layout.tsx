@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Button, Layout, Menu } from 'antd'
+import { Outlet } from 'react-router-dom'
 
 const { Header, Content, Sider } = Layout
 
@@ -70,6 +71,7 @@ const App: React.FC = () => {
           />
         </Sider>
         <Content style={{ height: '100%', width: '100%' }}>
+          <Outlet />
           <div style={{ padding: 24, minHeight: 360, backgroundColor: '#fff' }}>
             Bill is a cat.
           </div>
