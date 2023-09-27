@@ -14,7 +14,6 @@ const { Header, Content, Sider } = Layout
 
 // 定义导航菜单元素
 type MenuItem = Required<MenuProps>['items'][number]
-
 function getItem (
   label: React.ReactNode,
   key: React.Key,
@@ -72,9 +71,6 @@ const App: React.FC = () => {
         </Sider>
         <Content style={{ height: '100%', width: '100%' }}>
           <Outlet />
-          <div style={{ padding: 24, minHeight: 360, backgroundColor: '#fff' }}>
-            Bill is a cat.
-          </div>
         </Content>
       </Layout>
     </Layout>

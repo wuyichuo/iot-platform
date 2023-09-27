@@ -15,10 +15,13 @@ export const RouterGuard = (props: { routes: RouteObject[] }): React.ReactElemen
     // 全局路由守卫
     function guard (): void {
       const { pathname } = location
-      // 未登陆时自动跳转到登录页
       if (pathname !== '/login') {
+        // 未登陆时自动跳转到登录页
         if (token === null) {
           navigate('/login')
+        } else if (pathname === '/') {
+          // 登陆后默认跳转到地图
+          navigate('/home')
         }
       }
     }
