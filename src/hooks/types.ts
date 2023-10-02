@@ -3,3 +3,7 @@ export interface storageReturn {
   get: (name: string) => string | null
   remove: (name: string) => void
 }
+
+export interface useImgReturn {
+  getUrl: (path: string) => string
+}
