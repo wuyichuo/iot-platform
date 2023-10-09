@@ -34,7 +34,7 @@ const items: MenuItem[] = [
 ]
 
 const App: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false) // 导航栏是否展开
+  const [collapsed, setCollapsed] = useState(true) // 导航栏是否展开
 
   // DOM
   return (

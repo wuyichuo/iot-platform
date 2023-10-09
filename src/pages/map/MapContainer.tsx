@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import useImageUrl from '@/hooks/useImgHooks'
+import styles from './styles.module.css'
+// import ReactDOM from 'react-dom/client'
+import InfoWindow from './components/infoWindow'
 
 //   测试数据
 const markData = [
@@ -48,7 +51,7 @@ const MapContainer: React.FC = () => {
       .then((AMap) => {
         map = new AMap.Map('container', {
           viewMode: '3D', // 3D地图模式
-          zoom: 16, // 地图比例尺
+          zoom: 17, // 地图比例尺
           center: [120.34332989249378, 30.314101385002868] // 初始化地图中心点位置
         })
 
@@ -69,23 +72,36 @@ const MapContainer: React.FC = () => {
             icon: icons[index]
           })))
 
+        // const window = document.createElement('div')
+        // ReactDOM.createRoot(window).render(<InfoWindow />)
+        // const Window = new AMap.InfoWindow({
+        //   isCustom: true, // 使用自定义窗体
+        //   content: window
+        // })
+        // const position = new AMap.LngLat(120.34332989249378, 30.314101385002868)
         // 将创建的点标记添加到已有的地图
         map.on('complete', function () {
           map.add(markerList)
+          // Window.open(map, position)
         })
       })
       .catch((e) => {
         console.log(e)
       })
 
-    // 销毁地图实例
+    // 组件卸载时销毁地图实例
     return () => {
       map?.destroy()
     }
   }, [])
 
   return (
-    <div id="container" style={{ width: '100%', height: 'calc(100vh - 64px)' }}></div>
+    <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 64px)' }}>
+      <div id="container" style={{ width: '100%', height: '100%' }}></div>
+      <div className={styles.infoWindow}>
+          <InfoWindow />
+      </div>
+    </div>
   )
 }
 
