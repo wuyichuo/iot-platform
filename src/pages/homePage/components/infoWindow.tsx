@@ -2,7 +2,7 @@ import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import { useEffect, useState } from 'react'
 import styles from '../styles.module.css'
-import * as echarts from 'echarts'
+import { useChats } from '@/hooks/chartsHook'
 
 // 测试数据
 const infos = {
@@ -45,7 +45,6 @@ const InfoWindow: React.FC = () => {
   // 饼状图配置信息
   const option = {
     title: {
-      text: '设备类型：',
       textStyle: {
         color: '#000'
       }
@@ -105,26 +104,17 @@ const InfoWindow: React.FC = () => {
     ]
   }
 
-  // 图表初始化
-  const initCharts = (): void => {
-    // 设备类型饼状图
-    const deviceType = document.getElementById('deviceType')
-    if (deviceType !== null) {
-      const myChart = echarts.init(deviceType)
-      // 绘制图表
-      myChart.setOption(deviceTypeOption)
-    }
-
-    // 设备在线率饼状图
-    const onlineRatio = document.getElementById('onlineRatio')
-    if (onlineRatio !== null) {
-      const myChart = echarts.init(onlineRatio)
-      // 绘制图表
-      myChart.setOption(onlineRatioOption)
-    }
-  }
   useEffect(() => {
-    initCharts()
+    // 图表初始化
+    if (!expand) return
+    const deviceTypeChart = useChats('deviceType', deviceTypeOption)
+    const onlineRatioChart = useChats('onlineRatio', onlineRatioOption)
+
+    return () => {
+      // 销毁图表
+      deviceTypeChart.destroy()
+      onlineRatioChart.destroy()
+    }
   }, [expand])
 
   // DOM
