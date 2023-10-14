@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Button, Layout, Menu } from 'antd'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 
 const { Header, Content, Sider } = Layout
 
@@ -34,7 +34,9 @@ const items: MenuItem[] = [
 ]
 
 const App: React.FC = () => {
+  // 路由
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [collapsed, setCollapsed] = useState(true) // 导航栏是否展开
 
@@ -56,7 +58,13 @@ const App: React.FC = () => {
           collapsed={collapsed}
           style={{ backgroundColor: '#fff' }}
         >
-          <Menu theme="light" defaultSelectedKeys={['home']} mode="inline" items={items} onSelect={({ key }) => { navigate(key) }}/>
+          <Menu
+            theme="light"
+            selectedKeys={[location.pathname.substring(1)]}
+            mode="inline"
+            items={items}
+            onSelect={({ key }) => { navigate(key) }}
+          />
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
