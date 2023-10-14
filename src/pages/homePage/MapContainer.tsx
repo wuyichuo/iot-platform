@@ -61,7 +61,7 @@ const MapContainer: React.FC = () => {
     } else {
       // 不存在地图实例时重新加载地图
       AMapLoader.load({
-        key: '0c925ab02fe8ea3590803c230d2df8a5', // 高德地图Web端开发者Key
+        key: import.meta.env.VITE_APP_AMAP_KEY, // 高德地图Web端开发者Key
         version: '2.0',
         plugins: [] // 需要使用的的插件列表(必填项)
       })
