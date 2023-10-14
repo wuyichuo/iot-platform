@@ -106,7 +106,7 @@ const MapContainer: React.FC = () => {
           console.log(e)
         })
     }
-    // 组件卸载时销毁地图实例
+    // 组件卸载时保存地图实例
     return () => {
       dispatch(setMap(map))
     }

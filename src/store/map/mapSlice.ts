@@ -13,7 +13,7 @@ export const mapSlice = createSlice({
   name: 'mapInstance',
   initialState,
   reducers: {
-    // 登录
+    // 保存地图实例
     setMap: (state, action) => {
       state.amap = action.payload
     }
