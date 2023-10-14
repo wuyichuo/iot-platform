@@ -49,9 +49,14 @@ const MapContainer: React.FC = () => {
   useEffect(() => {
     // 存在地图实例时直接使用
     if (map !== null) {
-      const Parent = document.getElementById('containerParent')
-      if (Parent !== null) {
-        Parent.insertBefore(map.getContainer(), Parent.firstChild)
+      const containerParent = document.getElementById('containerParent')
+      if (containerParent !== null) {
+        // 将空容器替换成地图
+        const container = document.getElementById('container')
+        if (container !== null) {
+          containerParent.removeChild(container)
+        }
+        containerParent.insertBefore(map.getContainer(), containerParent.firstChild)
       }
     } else {
       // 不存在地图实例时重新加载地图
