@@ -1,12 +1,28 @@
 import * as echarts from 'echarts'
 import { type chartData, type chartsReturn } from './types'
 
+// 基础配置信息
+const basicOption = {
+  title: {
+    textStyle: {
+      color: '#000'
+    }
+  },
+  tooltip: {
+    trigger: 'item', // 鼠标悬浮时显示
+    formatter: '{b} ({c})' // 提示框内容的格式（key(value)）
+  },
+  series: [
+  ]
+}
+
 export function useChats (containerId: string, option: echarts.EChartsCoreOption): chartsReturn {
   // 绘制图表
   const init = (containerId: string, option: echarts.EChartsCoreOption): echarts.ECharts | null => {
     const element = document.getElementById(containerId)
     if (element !== null) {
       const myChart = echarts.init(element)
+      myChart.setOption(basicOption)
       myChart.setOption(option)
       return myChart
     } else {
@@ -35,6 +51,7 @@ export function useChats (containerId: string, option: echarts.EChartsCoreOption
   // 添加数据
   const addData = (data: chartData[]): void => {
     const newData = oldData.splice(0, data.length)
+    data.forEach(item => { newData.push(item) })
     if (myChart !== null) {
       myChart.setOption({
         series: [

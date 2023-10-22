@@ -11,7 +11,7 @@ export interface useImgReturn {
 }
 
 // useChats
-export interface chartData {
+export type chartData = number | {
   value: string | number
   name: string
 }

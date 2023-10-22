@@ -1,9 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import useImageUrl from '@/hooks/useImgHooks'
 import styles from './styles.module.css'
-// import ReactDOM from 'react-dom/client'
+import ReactDOM from 'react-dom/client'
 import InfoWindow from './components/infoWindow'
+import DeviceInfo from './components/deviceInfo'
+import DeviceDetail from './components/deviceDetail'
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks'
 import { setMap } from '@/store/map/mapSlice'
 
@@ -46,6 +48,8 @@ const MapContainer: React.FC = () => {
   let map = amap // 地图实例
   const imageUrl = useImageUrl() // 获取图片url
 
+  const [showDevice, setShowDevice] = useState<number | null>(null)
+
   useEffect(() => {
     // 存在地图实例时直接使用
     if (map !== null) {
@@ -82,20 +86,25 @@ const MapContainer: React.FC = () => {
           })
 
           // 标记点实例列表
-          const markerList = markData.map((item, index) => (
-            new AMap.Marker({
-              position: new AMap.LngLat(item.location.longitude, item.location.latitude), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-              title: item.name,
+          const markerList = markData.map((item, index) => {
+            const position = new AMap.LngLat(item.location.longitude, item.location.latitude)
+            const marker = new AMap.Marker({
+              position,
               icon: icons[index]
-            })))
+            })
+            // 设备信息弹窗
+            const window = document.createElement('div')
+            ReactDOM.createRoot(window).render(<DeviceInfo name={item.name} type={item.type} id={item.id}/>)
+            const Window = new AMap.InfoWindow({
+              isCustom: true, // 使用自定义窗体
+              content: window
+            })
+            marker.on('mouseover', () => { Window.open(map, position) })
+            marker.on('mouseout', () => { Window.close() })
+            marker.on('click', () => { setShowDevice(item.id) })
+            return marker
+          })
 
-          // const window = document.createElement('div')
-          // ReactDOM.createRoot(window).render(<InfoWindow />)
-          // const Window = new AMap.InfoWindow({
-          //   isCustom: true, // 使用自定义窗体
-          //   content: window
-          // })
-          // const position = new AMap.LngLat(120.34332989249378, 30.314101385002868)
           // 将创建的点标记添加到已有的地图
           map.on('complete', function () {
             map.add(markerList)
@@ -118,6 +127,9 @@ const MapContainer: React.FC = () => {
       <div className={styles.infoWindow}>
           <InfoWindow />
       </div>
+      {showDevice !== null && <div className={styles.deviceWindow}>
+          <DeviceDetail id={showDevice} close={() => { setShowDevice(null) }}/>
+      </div>}
     </div>
   )
 }
