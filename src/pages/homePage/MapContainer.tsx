@@ -6,9 +6,8 @@ import ReactDOM from 'react-dom/client'
 import InfoWindow from './components/infoWindow'
 import DeviceInfo from './components/deviceInfo'
 import DeviceDetail from './components/deviceDetail'
-// import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks'
-// import { setMap } from '@/store/map/mapSlice'
 import { Form, Input, Modal, Select } from 'antd'
+import { useLocation } from 'react-router-dom'
 
 //   测试数据
 const testData = [
@@ -52,19 +51,24 @@ interface markType {
 }
 
 const MapContainer: React.FC = () => {
-  const mapInstanceRef = useRef<null | any>(null)
+  // 控制地图隐藏
+  const url = useLocation()
+  const [hidden, setHidden] = useState(true)
+
+  const mapInstanceRef = useRef<any>(null) // 地图实例
+  const locationRef = useRef({
+    latitude: 0,
+    longitude: 0
+  })
   const imageUrl = useImageUrl() // 获取图片url
 
   const [form] = Form.useForm()
 
   const [showDevice, setShowDevice] = useState<null | number>(null)
-  const [markData, setMarkData] = useState(testData)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [location, setLocation] = useState({
-    latitude: 0,
-    longitude: 0
-  })
+  const [markData, setMarkData] = useState(testData)
 
+  // 弹窗控制
   const handleOk = (): void => {
     form
       .validateFields()
@@ -73,7 +77,6 @@ const MapContainer: React.FC = () => {
         setIsModalOpen(false)
       })
       .catch((errorInfo) => {
-      // 表单验证失败，你可以在这里处理错误信息或其他逻辑
         console.log('Validation failed:', errorInfo)
       })
   }
@@ -81,6 +84,7 @@ const MapContainer: React.FC = () => {
     setIsModalOpen(false)
   }
 
+  // 添加标记点
   const addMarker = (device: markType): void => {
     AMapLoader.load({
       key: import.meta.env.VITE_APP_AMAP_KEY, // 高德地图Web端开发者Key
@@ -121,23 +125,25 @@ const MapContainer: React.FC = () => {
       })
   }
 
+  // 添加设备
   const addDevice = (type: string, name: string): void => {
     const arr = markData
     arr.push({
       id: 2,
       type,
-      location,
+      location: locationRef.current,
       name
     })
     setMarkData(arr)
     addMarker({
       id: 2,
       type,
-      location,
+      location: locationRef.current,
       name
     })
   }
 
+  // 初始化地图
   const initMap = (): void => {
     AMapLoader.load({
       key: import.meta.env.VITE_APP_AMAP_KEY, // 高德地图Web端开发者Key
@@ -154,10 +160,10 @@ const MapContainer: React.FC = () => {
         markData.forEach(item => { addMarker(item) })
         // 右键添加设备
         mapInstanceRef.current.on('rightclick', (e: any) => {
-          setLocation({
+          locationRef.current = {
             latitude: e.lnglat.getLat(),
             longitude: e.lnglat.getLng()
-          })
+          }
           setIsModalOpen(true)
         })
       })
@@ -166,29 +172,28 @@ const MapContainer: React.FC = () => {
       })
   }
 
+  // 初始化
   useEffect(() => {
-    // 存在地图实例时直接使用
-    if (mapInstanceRef.current !== null) {
-      const containerParent = document.getElementById('containerParent')
-      if (containerParent !== null) {
-        // 将空容器替换成地图
-        const container = document.getElementById('container')
-        if (container !== null) {
-          containerParent.removeChild(container)
-        }
-        containerParent.insertBefore(mapInstanceRef.current.getContainer(), containerParent.firstChild)
-      }
-    } else {
-      // 不存在地图实例时重新加载地图
-      initMap()
-    }
+    initMap()
     return () => {
+      mapInstanceRef.current?.destroy()
     }
   }, [])
 
+  // 判断是否隐藏地图
+  useEffect(() => {
+    setHidden(url.pathname !== '/home')
+  }, [url.pathname])
+
   return (
-    <div id='containerParent' style={{ position: 'relative', width: '100%', height: 'calc(100vh - 64px)' }}>
-      <div id="container" style={{ width: '100%', height: '100%' }}></div>
+    <div
+      style={{ position: 'relative', width: '100%', height: 'calc(100vh - 64px)' }}
+      className={hidden ? styles.hide : ''}
+    >
+      <div
+        id="container"
+        style={{ width: '100%', height: '100%' }}
+      ></div>
       <div className={styles.infoWindow}>
           <InfoWindow />
       </div>
@@ -200,7 +205,6 @@ const MapContainer: React.FC = () => {
           form={form}
           style={{ maxWidth: 600 }}
           initialValues={{ remember: true }}
-          // autoComplete="off"
         >
           <Form.Item
             label="设备名称"

@@ -9,6 +9,7 @@ import {
 import type { MenuProps } from 'antd'
 import { Button, Layout, Menu } from 'antd'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import MapContainer from './pages/homePage/MapContainer'
 
 const { Header, Content, Sider } = Layout
 
@@ -79,6 +80,7 @@ const App: React.FC = () => {
           />
         </Sider>
         <Content style={{ height: '100%', width: '100%' }}>
+          <MapContainer />
           <Outlet />
         </Content>
       </Layout>

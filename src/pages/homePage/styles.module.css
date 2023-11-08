@@ -1,3 +1,7 @@
+/* 隐藏地图 */
+.hide {
+    display: none;
+}
 /* 基本信息窗口 */
 .infoWindow {
     position: absolute;
