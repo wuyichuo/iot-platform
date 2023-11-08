@@ -167,7 +167,6 @@ const MapContainer: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log(mapInstanceRef.current)
     // 存在地图实例时直接使用
     if (mapInstanceRef.current !== null) {
       const containerParent = document.getElementById('containerParent')
@@ -182,6 +181,8 @@ const MapContainer: React.FC = () => {
     } else {
       // 不存在地图实例时重新加载地图
       initMap()
+    }
+    return () => {
     }
   }, [])
 
