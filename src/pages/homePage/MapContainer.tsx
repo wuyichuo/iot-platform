@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import useImageUrl from '@/hooks/useImgHooks'
 import styles from './styles.module.css'
@@ -6,8 +6,8 @@ import ReactDOM from 'react-dom/client'
 import InfoWindow from './components/infoWindow'
 import DeviceInfo from './components/deviceInfo'
 import DeviceDetail from './components/deviceDetail'
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks'
-import { setMap } from '@/store/map/mapSlice'
+// import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks'
+// import { setMap } from '@/store/map/mapSlice'
 import { Form, Input, Modal, Select } from 'antd'
 
 //   测试数据
@@ -52,16 +52,12 @@ interface markType {
 }
 
 const MapContainer: React.FC = () => {
-  // Redux
-  const { amap } = useAppSelector(state => state.map)
-  const dispatch = useAppDispatch()
-
-  let map = amap // 地图实例
+  const mapInstanceRef = useRef<null | any>(null)
   const imageUrl = useImageUrl() // 获取图片url
 
   const [form] = Form.useForm()
 
-  const [showDevice, setShowDevice] = useState<number | null>(null)
+  const [showDevice, setShowDevice] = useState<null | number>(null)
   const [markData, setMarkData] = useState(testData)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [location, setLocation] = useState({
@@ -113,12 +109,12 @@ const MapContainer: React.FC = () => {
           isCustom: true, // 使用自定义窗体
           content: window
         })
-        marker.on('mouseover', () => { Window.open(map, position) })
+        marker.on('mouseover', () => { Window.open(mapInstanceRef.current, position) })
         marker.on('mouseout', () => { Window.close() })
         marker.on('click', () => { setShowDevice(device.id) })
 
         // 将创建的点标记添加到已有的地图
-        map.add(marker)
+        mapInstanceRef.current.add(marker)
       })
       .catch((e) => {
         console.log(e)
@@ -149,7 +145,7 @@ const MapContainer: React.FC = () => {
       plugins: [] // 需要使用的的插件列表(必填项)
     })
       .then((AMap) => {
-        map = new AMap.Map('container', {
+        mapInstanceRef.current = new AMap.Map('container', {
           viewMode: '3D', // 3D地图模式
           zoom: 17, // 地图比例尺
           center: [120.34332989249378, 30.314101385002868] // 初始化地图中心点位置
@@ -157,7 +153,7 @@ const MapContainer: React.FC = () => {
         // 标记点实例列表
         markData.forEach(item => { addMarker(item) })
         // 右键添加设备
-        map.on('rightclick', (e: any) => {
+        mapInstanceRef.current.on('rightclick', (e: any) => {
           setLocation({
             latitude: e.lnglat.getLat(),
             longitude: e.lnglat.getLng()
@@ -171,8 +167,9 @@ const MapContainer: React.FC = () => {
   }
 
   useEffect(() => {
+    console.log(mapInstanceRef.current)
     // 存在地图实例时直接使用
-    if (map !== null) {
+    if (mapInstanceRef.current !== null) {
       const containerParent = document.getElementById('containerParent')
       if (containerParent !== null) {
         // 将空容器替换成地图
@@ -180,15 +177,11 @@ const MapContainer: React.FC = () => {
         if (container !== null) {
           containerParent.removeChild(container)
         }
-        containerParent.insertBefore(map.getContainer(), containerParent.firstChild)
+        containerParent.insertBefore(mapInstanceRef.current.getContainer(), containerParent.firstChild)
       }
     } else {
       // 不存在地图实例时重新加载地图
       initMap()
-    }
-    // 组件卸载时保存地图实例
-    return () => {
-      dispatch(setMap(map))
     }
   }, [])
 
@@ -221,7 +214,6 @@ const MapContainer: React.FC = () => {
             rules={[{ type: 'string', required: true, message: '请选择设备类型!' }]}
           >
             <Select
-              // onChange={handleChange}
               options={[
                 { value: 'camera', label: '摄像头' },
                 { value: 'temperatureSensor', label: '温度传感器' },
