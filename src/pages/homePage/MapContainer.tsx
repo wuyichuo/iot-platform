@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import useImageUrl from '@/hooks/useImgHooks'
 import styles from './styles.module.css'
@@ -53,7 +53,7 @@ interface markType {
 const MapContainer: React.FC = () => {
   // 控制地图隐藏
   const url = useLocation()
-  const [hidden, setHidden] = useState(true)
+  const hidden = useMemo(() => (url.pathname !== '/home'), [url.pathname])
 
   const mapInstanceRef = useRef<any>(null) // 地图实例
   const locationRef = useRef({
@@ -145,6 +145,9 @@ const MapContainer: React.FC = () => {
 
   // 初始化地图
   const initMap = (): void => {
+    if (mapInstanceRef.current !== null) {
+      return
+    }
     AMapLoader.load({
       key: import.meta.env.VITE_APP_AMAP_KEY, // 高德地图Web端开发者Key
       version: '2.0',
@@ -172,18 +175,20 @@ const MapContainer: React.FC = () => {
       })
   }
 
-  // 初始化
+  // 判断是否隐藏地图
   useEffect(() => {
-    initMap()
+    // 初始化
+    if (!hidden) {
+      initMap()
+    }
+  }, [hidden])
+
+  // 销毁地图
+  useEffect(() => {
     return () => {
       mapInstanceRef.current?.destroy()
     }
   }, [])
-
-  // 判断是否隐藏地图
-  useEffect(() => {
-    setHidden(url.pathname !== '/home')
-  }, [url.pathname])
 
   return (
     <div
