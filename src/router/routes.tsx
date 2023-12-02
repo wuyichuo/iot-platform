@@ -2,6 +2,7 @@ import { type RouteObject } from 'react-router-dom'
 import Layout from '@/layout'
 import Login from '@/pages/login'
 import DataPage from '@/pages/dataPage/dataPage'
+import PhoneMap from '@/pages/homePage/mobile/MapContainer'
 
 const AppRoutes: RouteObject[] = [
   {
@@ -21,6 +22,10 @@ const AppRoutes: RouteObject[] = [
   {
     path: 'login',
     element: <Login />
+  },
+  {
+    path: 'phonemap',
+    element: <PhoneMap />
   }
 ]
 
