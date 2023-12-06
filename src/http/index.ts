@@ -1,4 +1,4 @@
-import axios, { AxiosError, type AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import { useStorage } from '@/hooks/storageHooks'
 import qs from 'query-string'
 
@@ -15,7 +15,7 @@ const requestInstance = axios.create({
 })
 
 // 封装请求方法
-export async function request<T = any, D = any> (config: AxiosRequestConfig<D>): Promise<T> {
+async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Promise<T> {
   return await new Promise((resolve, reject) => {
     const { ...restConfig } = config
     requestInstance.request({
@@ -56,3 +56,18 @@ export async function request<T = any, D = any> (config: AxiosRequestConfig<D>):
     })
   })
 }
+
+// 添加方法属性
+MyRequest.get = async <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  return await MyRequest<T>({ ...config, method: 'get', url })
+}
+
+MyRequest.post = async <T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+  return await MyRequest<T>({ ...config, method: 'post', url, data })
+}
+
+MyRequest.delete = async <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  return await MyRequest<T>({ ...config, method: 'delete', url })
+}
+
+export { MyRequest }

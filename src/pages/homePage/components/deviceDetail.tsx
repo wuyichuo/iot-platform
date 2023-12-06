@@ -3,6 +3,7 @@ import styles from '../styles.module.css'
 import { Button } from 'antd'
 import { CloseSquareOutlined } from '@ant-design/icons'
 import LineChat from '@/components/lineChart'
+// import { MyRequest } from '@/http'
 
 // 测试数据
 const info = {
@@ -37,6 +38,15 @@ const deviceDetail: React.FC<deviceDetailProps> = (props) => {
     //   newData.value.push(newData.value[newData.value.length - 1] + 1)
     //   setData(newData)
     // }, 500)
+
+    // // api测试
+    // MyRequest.get('./test.json')
+    //   .then(responseData => {
+    //     console.log('GET 请求成功:', responseData)
+    //   })
+    //   .catch(error => {
+    //     console.error('GET 请求失败:', error.message)
+    //   })
   }, [])
 
   // DOM
@@ -53,13 +63,24 @@ const deviceDetail: React.FC<deviceDetailProps> = (props) => {
         </Button>
       </div>
       <div className={styles.content}>
-          <p>设备ID：{props.id}</p>
-          <p>设备名称：{info.name}</p>
-          <p>设备类型：{info.type}</p>
-          <div className={styles.piechart}>
-            <LineChat title='设备数据' data={data} />
-          </div>
+        <p>设备ID：{props.id}</p>
+        <p>设备名称：{info.name}</p>
+        <p>设备类型：{info.type}</p>
+        <div className={styles.piechart}>
+          <LineChat title='设备数据' data={data} />
         </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-around'
+          }}>
+          <Button type='primary' >启动</Button>
+          <Button type='primary' >关闭</Button>
+          <Button type='primary' >编辑</Button>
+          <Button type='primary' >删除</Button>
+        </div>
+      </div>
     </div>
   )
 }
