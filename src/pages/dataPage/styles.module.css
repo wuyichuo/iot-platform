@@ -2,33 +2,18 @@
     height: 100%;
     min-height: calc(100vh - 64px);
     width: 100%;
-    padding-top: 10px;
-    padding-left: calc(5% - 36px);
-    margin: auto;
     background-color: rebeccapurple;
 }
 /* 图表尺寸 */
-.largeChart {
-    float: left;
-    height: 420px;
-    width: calc(54% + 40px);
+.chartBox {
     background-color: #fff;
     border-radius: 10px;
-    margin: 10px;
+    padding: 10px;
 }
-.midChart {
-    float: left;
-    height: 420px;
-    width: calc(36% + 20px);
-    background-color: #fff;
+.chartBoxEdit {
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    background-color: rgb(245, 245, 245);
     border-radius: 10px;
-    margin: 10px;
-}
-.smallChart {
-    float: left;
-    height: 200px;
-    width: 18%;
-    background-color: #fff;
-    border-radius: 10px;
-    margin: 10px;
+    padding: 10px;
 }
