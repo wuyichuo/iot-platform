@@ -1,6 +1,6 @@
 import { type RouteObject } from 'react-router-dom'
 import Layout from '@/layout'
-import Login from '@/pages/login'
+import Login from '@/pages/loginPage/login'
 import DataPage from '@/pages/dataPage/dataPage'
 import PhoneMap from '@/pages/homePage/mobile/MapContainer'
 
