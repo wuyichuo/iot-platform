@@ -77,7 +77,6 @@ const deviceDetail: React.FC<deviceDetailProps> = (props) => {
           }}>
           <Button type='primary' >启动</Button>
           <Button type='primary' >关闭</Button>
-          <Button type='primary' >编辑</Button>
           <Button type='primary' >删除</Button>
         </div>
       </div>

@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import {
   PieChartOutlined,
   HomeOutlined,
-  MessageOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined
 } from '@ant-design/icons'
@@ -30,8 +29,7 @@ function getItem (
 // 导航选项
 const items: MenuItem[] = [
   getItem('主页', 'home', <HomeOutlined />),
-  getItem('数据展示', 'data', <PieChartOutlined />),
-  getItem('设备消息', 'msg', <MessageOutlined />)
+  getItem('数据展示', 'data', <PieChartOutlined />)
 ]
 
 const App: React.FC = () => {
