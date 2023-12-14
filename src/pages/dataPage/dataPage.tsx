@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { FloatButton, Modal } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import styles from './styles.module.css'
@@ -21,7 +21,10 @@ const dataPage: React.FC = () => {
   const [layout, setLayout] = useState(view.map(e => (
     { i: e.id, x: e.x, y: e.y, w: e.w, h: e.h }
   )))
-  const [isEditing, stIsEditing] = useState<boolean>(false)
+  const oldLayout = useRef(view.map(e => (
+    { i: e.id, x: e.x, y: e.y, w: e.w, h: e.h }
+  )))
+  const [isEditing, setIsEditing] = useState<boolean>(false)
 
   // 测试数据——图表数据
   const [data, setData] = useState({
@@ -31,7 +34,14 @@ const dataPage: React.FC = () => {
 
   // 关闭编辑弹窗
   const handelModalCancel = (): void => {
-    stIsEditing(false)
+    setLayout(oldLayout.current)
+    setIsEditing(false)
+  }
+
+  // 开始编辑
+  const editLayout = (): void => {
+    oldLayout.current = layout
+    setIsEditing(true)
   }
 
   // 关闭sokect链接
@@ -56,13 +66,13 @@ const dataPage: React.FC = () => {
         icon={<EditOutlined />}
         type="primary"
         style={{ right: 24 }}
-        onClick={() => { stIsEditing(true) }}
+        onClick={editLayout}
       />
       <Modal
         title="编辑视图"
         open={isEditing}
         width="95%"
-        onOk={() => { stIsEditing(false) }}
+        onOk={() => { setIsEditing(false) }}
         onCancel={handelModalCancel}
         okText='保存'
         cancelText='取消'
