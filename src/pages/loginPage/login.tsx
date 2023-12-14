@@ -17,13 +17,17 @@ const App: React.FC = () => {
 
   // 用户登录
   const Login = async (username: string, password: string): Promise<void> => {
-    const encryptedPwd = await encrypt(password) // 加密
-    // 登录请求
-    const token = await LoginAPI({
-      username,
-      password: encryptedPwd
-    })
-    storage.set('access_token', token)
+    try {
+      const encryptedPwd = await encrypt(password) // 加密
+      // 登录请求
+      const token = await LoginAPI({
+        username,
+        password: encryptedPwd
+      })
+      storage.set('access_token', token)
+    } catch (error) {
+      await Promise.reject(error) // 将错误包装在一个拒绝状态的 promise 中
+    }
   }
 
   const onFinish = (values: any): void => {
@@ -36,7 +40,7 @@ const App: React.FC = () => {
         navigate('/home')
       })
       .catch((error) => {
-        void message.error(error)
+        void message.error(error.message)
         console.error(error)
       })
   }
