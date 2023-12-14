@@ -1,34 +1,59 @@
 import React from 'react'
-import { Button, Checkbox, Form, Input } from 'antd'
+import { Button, Checkbox, Form, Input, message } from 'antd'
 import { useAppDispatch } from '@/hooks/reduxHooks'
 import { setUserName } from '@/store/user/userSlice'
 import { useNavigate } from 'react-router-dom'
+import { useStorage } from '@/hooks/storageHooks'
+import JSEncrypt from 'jsencrypt'
 import styles from './styles.module.css'
-
-interface FieldType {
-  username?: string
-  password?: string
-  remember?: string
-}
+import { LoginAPI, PublicKeyAPI } from './api'
+import { type FieldType } from './type'
 
 const App: React.FC = () => {
+  // hooks
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const storage = useStorage()
 
   // 用户登录
-  const Login = (username: string): void => {
-    dispatch(setUserName(username))
-    // 跳转到首页
-    navigate('/home')
+  const Login = async (username: string, password: string): Promise<void> => {
+    const encryptedPwd = await encrypt(password) // 加密
+    // 登录请求
+    const token = await LoginAPI({
+      username,
+      password: encryptedPwd
+    })
+    storage.set('access_token', token)
   }
 
   const onFinish = (values: any): void => {
     console.log('Success:', values)
-    Login(values.username)
+    Login(values.username, values.password)
+      .then(() => {
+        void message.success('登陆成功')
+        dispatch(setUserName(values.username))
+        // 跳转到首页
+        navigate('/home')
+      })
+      .catch((error) => {
+        void message.error(error)
+        console.error(error)
+      })
   }
 
-  const onFinishFailed = (errorInfo: any): void => {
-    console.log('Failed:', errorInfo)
+  // 密码加密
+  const encrypt = async (dataToEncrypt: string): Promise<string> => {
+    const publicKey = await PublicKeyAPI() // 获取公钥
+    // 加密
+    const encrypt = new JSEncrypt()
+    encrypt.setPublicKey(publicKey)
+    const encrypted = encrypt.encrypt(dataToEncrypt)
+    // 错误处理
+    if (encrypted !== false) {
+      console.log('result:', encrypted)
+      return encrypted
+    }
+    throw new Error('系统错误')
   }
 
   return (
