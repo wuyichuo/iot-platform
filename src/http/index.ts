@@ -41,6 +41,7 @@ async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Prom
       }
     }).catch((err) => {
       console.log(err)
+      reject(new Error('网络错误, 请稍后重试!'))
     //   if (err instanceof AxiosError) {
     //     if (err.response?.data) {
     //       if (typeof err.response.data !== 'object') {
