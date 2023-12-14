@@ -9,6 +9,7 @@ import type { MenuProps } from 'antd'
 import { Button, Layout, Menu } from 'antd'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import MapContainer from './pages/homePage/desktop/MapContainer'
+import LayoutHeader from '@/components/layoutHeader'
 
 const { Header, Content, Sider } = Layout
 
@@ -43,12 +44,7 @@ const App: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ padding: 0 }} >
-        <h1
-          style={{
-            color: '#fff',
-            marginLeft: 20
-          }}
-        >物联网平台</h1>
+        <LayoutHeader />
       </Header>
       <Layout>
         <Sider

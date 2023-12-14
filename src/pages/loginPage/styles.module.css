@@ -1,0 +1,22 @@
+.bg {
+    background-color: rgb(245, 245, 245);
+    background-image: url('./loginBG.jpg');
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.form {
+    background-color: rgb(245, 245, 245, 0.5);
+    width: 30%;
+    height: 35%;
+    padding: 20px 20px 0;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
