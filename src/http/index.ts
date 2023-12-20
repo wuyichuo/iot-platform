@@ -4,7 +4,7 @@ import qs from 'query-string'
 
 const storage = useStorage()
 
-const baseURL = import.meta.env.VITE_API_PREFIX // 服务地址
+const baseURL = import.meta.env.VITE_APP_API_URL // 服务地址
 axios.defaults.timeout = 6000 // 超时时间
 
 // 创建请求实例
@@ -36,6 +36,8 @@ async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Prom
         // if (typeof resp.data !== 'object') {
         //   reject(new Error(resp.data))
         // }
+      } else if (res.status === 500) {
+        reject(new Error('后端错误'))
       } else {
         reject(new Error('网络错误, 请稍后重试!'))
       }
