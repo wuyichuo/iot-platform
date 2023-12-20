@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { useAppDispatch } from '@/hooks/reduxHooks'
 import { setUserName } from '@/store/user/userSlice'
@@ -8,6 +8,7 @@ import JSEncrypt from 'jsencrypt'
 import styles from './styles.module.css'
 import { LoginAPI, PublicKeyAPI } from './api'
 import { type FieldType } from './type'
+import { MyRequest } from '@/http'
 
 const App: React.FC = () => {
   // hooks
@@ -59,6 +60,14 @@ const App: React.FC = () => {
     }
     throw new Error('系统错误')
   }
+
+  async function test (): Promise<void> {
+    const res = await MyRequest.get('/IotPlatform/basicData')
+    console.log(res)
+  }
+  useEffect(() => {
+    void test()
+  })
 
   return (
     <div className={styles.bg}>

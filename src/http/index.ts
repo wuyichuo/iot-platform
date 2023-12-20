@@ -1,8 +1,8 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { useStorage } from '@/hooks/storageHooks'
+// import { useStorage } from '@/hooks/storageHooks'
 import qs from 'query-string'
 
-const storage = useStorage()
+// const storage = useStorage()
 
 const baseURL = import.meta.env.VITE_APP_API_URL // 服务地址
 axios.defaults.timeout = 6000 // 超时时间
@@ -10,7 +10,8 @@ axios.defaults.timeout = 6000 // 超时时间
 // 创建请求实例
 const requestInstance = axios.create({
   baseURL,
-  headers: { access_token: storage.get('token') },
+  // headers: { access_token: storage.get('token') },
+  headers: { access_token: '21y7t8y42174' },
   withCredentials: true // 跨域
 })
 
