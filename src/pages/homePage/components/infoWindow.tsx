@@ -60,6 +60,20 @@ const InfoWindow: React.FC = () => {
   ])
 
   useEffect(() => {
+    setDeviceTypeData(infos.deviceTypesCount.map(item => ({
+      value: item.count,
+      name: item.type
+    })))
+    setOnlineRatioData([
+      {
+        value: infos.onlineDevicesCount,
+        name: '在线设备'
+      },
+      {
+        value: infos.offlineDevicesCount,
+        name: '离线设备'
+      }
+    ])
     // 修改数据
   }, [expand])
 

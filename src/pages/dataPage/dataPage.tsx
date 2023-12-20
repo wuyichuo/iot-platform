@@ -46,6 +46,10 @@ const dataPage: React.FC = () => {
 
   // 关闭sokect链接
   useEffect(() => {
+    setData({
+      date: [1, 2, 3],
+      value: [1, 2, 3]
+    })
     return () => {
     }
   }, [])

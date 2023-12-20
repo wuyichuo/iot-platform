@@ -50,7 +50,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ isModalOpen, setIsModalOpen, subm
   // 获取定位
   const getLocation = (): void => {
     // 向RN发送消息
-    window.ReactNativeWebView.postMessage('getLocation')
+    (window as any).ReactNativeWebView.postMessage('getLocation')
     setTimeout(() => {
       const string = localStorage.getItem('location')
       if (string !== null) {

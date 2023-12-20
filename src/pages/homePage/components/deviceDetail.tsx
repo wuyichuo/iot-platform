@@ -29,6 +29,10 @@ const deviceDetail: React.FC<deviceDetailProps> = (props) => {
   })
 
   useEffect(() => {
+    setData({
+      date: [1, 2, 3],
+      value: [1, 2, 3]
+    })
     // 动态数据测试
     // const newData = { ...data }
     // setInterval(function () {

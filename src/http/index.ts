@@ -27,6 +27,7 @@ async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Prom
     }).then((res) => {
       if (res.status >= 200 && res.status < 300) {
         console.log(res)
+        resolve(res.data)
         // if (rawResponse) {
         //   resolve(resp.data)
         // }
