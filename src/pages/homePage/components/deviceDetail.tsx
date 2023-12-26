@@ -3,7 +3,7 @@ import styles from '../styles.module.css'
 import { Button } from 'antd'
 import { CloseSquareOutlined } from '@ant-design/icons'
 import LineChat from '@/components/lineChart'
-// import { MyRequest } from '@/http'
+import RangeSelector from '@/components/rangeSelector'
 
 // 测试数据
 const info = {
@@ -66,8 +66,9 @@ const deviceDetail: React.FC<deviceDetailProps> = (props) => {
         <p>设备ID：{props.id}</p>
         <p>设备名称：{info.name}</p>
         <p>设备类型：{info.type}</p>
+        <text>数据范围：</text><RangeSelector size='small'/>
         <div className={styles.piechart}>
-          <LineChat title='设备数据' data={data} />
+          <LineChat title='设备数据：' data={data} />
         </div>
         <div
           style={{

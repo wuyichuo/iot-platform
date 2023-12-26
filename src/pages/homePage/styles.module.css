@@ -15,7 +15,7 @@
 .content {
     margin-top: 20px;
 }
-.content p {
+.content text, p {
     margin-bottom: 5px;
     font-weight: 700;
     font-size: 18px;
