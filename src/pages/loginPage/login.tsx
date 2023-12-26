@@ -62,7 +62,7 @@ const App: React.FC = () => {
   }
 
   async function test (): Promise<void> {
-    const res = await MyRequest.get('/IotPlatform/basicData')
+    const res = await MyRequest.get('/basicData')
     console.log(res)
   }
   useEffect(() => {

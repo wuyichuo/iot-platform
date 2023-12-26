@@ -4,7 +4,7 @@ import qs from 'query-string'
 
 // const storage = useStorage()
 
-const baseURL = import.meta.env.VITE_APP_API_URL // 服务地址
+const baseURL = '/IotPlatform' // 服务地址
 axios.defaults.timeout = 6000 // 超时时间
 
 // 创建请求实例
