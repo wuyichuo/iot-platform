@@ -1,12 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { type userInfo } from './userType'
-import { useStorage } from '@/hooks/storageHooks'
-
-const storage = useStorage()
 
 // 默认值
 const initialState: userInfo = {
-  username: null
+  username: null,
+  company: null
 }
 
 export const userSlice = createSlice({
@@ -14,13 +12,12 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     // 登录
-    setUserName: (state, action) => {
-      storage.set('token', action.payload)
-      state.username = action.payload
+    setUser: (state, action) => {
+      state = action.payload
     }
   }
 })
 
-export const { setUserName } = userSlice.actions
+export const { setUser } = userSlice.actions
 
 export default userSlice.reducer

@@ -1,78 +1,91 @@
-import React, { useEffect } from 'react'
-import { Button, Checkbox, Form, Input, message } from 'antd'
-import { useAppDispatch } from '@/hooks/reduxHooks'
-import { setUserName } from '@/store/user/userSlice'
+import React, { useEffect, useRef } from 'react'
+import { Button, Checkbox, Form, type FormInstance, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { useStorage } from '@/hooks/storageHooks'
 import JSEncrypt from 'jsencrypt'
 import styles from './styles.module.css'
 import { LoginAPI, PublicKeyAPI } from './api'
 import { type FieldType } from './type'
-import { MyRequest } from '@/http'
 
 const App: React.FC = () => {
   // hooks
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const storage = useStorage()
+
+  const publicKeyRef = useRef<string>('')
+  const formRef = useRef<FormInstance>(null)
 
   // 用户登录
   const Login = async (username: string, password: string): Promise<void> => {
     try {
       const encryptedPwd = await encrypt(password) // 加密
       // 登录请求
-      const token = await LoginAPI({
+      const res = await LoginAPI({
         username,
         password: encryptedPwd
       })
-      storage.set('access_token', token)
+      storage.set('token', res.token)
+      storage.set('company', res.company)
+      storage.set('user', username)
     } catch (error) {
       await Promise.reject(error) // 将错误包装在一个拒绝状态的 promise 中
     }
   }
 
   const onFinish = (values: any): void => {
-    console.log('Success:', values)
+    if (values.remember === true) {
+      storage.set('password', values.password)
+      storage.set('username', values.username)
+    } else {
+      storage.set('password', '')
+      storage.set('username', '')
+    }
     Login(values.username, values.password)
       .then(() => {
         void message.success('登陆成功')
-        dispatch(setUserName(values.username))
-        // 跳转到首页
-        navigate('/home')
+        navigate('/home') // 跳转到首页
       })
-      .catch((error) => {
-        void message.error(error.message)
-        console.error(error)
+      .catch((err) => {
+        void message.error(err.message)
       })
   }
 
   // 密码加密
   const encrypt = async (dataToEncrypt: string): Promise<string> => {
-    const publicKey = await PublicKeyAPI() // 获取公钥
     // 加密
     const encrypt = new JSEncrypt()
-    encrypt.setPublicKey(publicKey)
+    encrypt.setPublicKey(publicKeyRef.current)
     const encrypted = encrypt.encrypt(dataToEncrypt)
     // 错误处理
     if (encrypted !== false) {
-      console.log('result:', encrypted)
       return encrypted
     }
     throw new Error('系统错误')
   }
 
-  async function test (): Promise<void> {
-    const res = await MyRequest.get('/basicData')
-    console.log(res)
-  }
   useEffect(() => {
-    void test()
+    // 获取公钥
+    const getPublicKey = async (): Promise<void> => {
+      publicKeyRef.current = await PublicKeyAPI()
+    }
+    getPublicKey().catch(console.error)
+    // 自动填充密码
+    const password = storage.get('password')
+    const username = storage.get('username')
+    if (password !== '' && username !== '') {
+      formRef.current?.setFieldsValue({
+        username,
+        password,
+        remember: true
+      })
+    }
   })
 
   return (
     <div className={styles.bg}>
       <Form
         name="basic"
+        ref={formRef}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 18 }}
         style={{ maxWidth: 600 }}
@@ -98,13 +111,13 @@ const App: React.FC = () => {
         >
           <Input.Password size='large' />
         </Form.Item>
-        {/* 自动登录 */}
+        {/* 记住密码 */}
         <Form.Item<FieldType>
           name="remember"
           valuePropName="checked"
           wrapperCol={{ offset: 4, span: 16 }}
         >
-          <Checkbox>自动登录</Checkbox>
+          <Checkbox>记住密码</Checkbox>
         </Form.Item>
         {/* 提交 */}
         <Form.Item wrapperCol={{ offset: 10, span: 14 }}>

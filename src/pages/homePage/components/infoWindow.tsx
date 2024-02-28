@@ -1,8 +1,10 @@
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { Button, message } from 'antd'
 import { useEffect, useState } from 'react'
 import styles from '../styles.module.css'
 import PieChat from '@/components/pieChat'
+import { BasicDataAPI } from '../api'
+import { useNavigate } from 'react-router-dom'
 
 // 测试数据
 const infos = {
@@ -39,14 +41,23 @@ const infos = {
   deviceErrorCount: 120
 }
 
+interface basicDataType {
+  devicesCount: number
+  onlineDevicesCount: number
+  offlineDevicesCount: number
+  deviceTypeData: []
+  onlineRatioData: []
+}
+
 const InfoWindow: React.FC = () => {
+  const navigate = useNavigate()
+
   const [expand, setExpand] = useState(false) // infoWindow是否展开
 
+  const [basicData, setBasicData] = useState<basicDataType | null>(null)
+
   // 设备类型数据
-  const [deviceTypeData, setDeviceTypeData] = useState(infos.deviceTypesCount.map(item => ({
-    value: item.count,
-    name: item.type
-  })))
+  const [deviceTypeData, setDeviceTypeData] = useState([])
   // 设备在线率数据
   const [onlineRatioData, setOnlineRatioData] = useState([
     {
@@ -59,8 +70,23 @@ const InfoWindow: React.FC = () => {
     }
   ])
 
+  const getBasicData = (): void => {
+    BasicDataAPI()
+      .then(data => {
+        setBasicData(data)
+      })
+      .catch((err) => {
+        void message.error(err.message)
+        if (err.message === '请重新登录') {
+          navigate('/login')
+        }
+      })
+  }
+
   useEffect(() => {
-    // 修改数据
+    if (expand) {
+      getBasicData()
+    }
   }, [expand])
 
   // DOM
@@ -77,17 +103,15 @@ const InfoWindow: React.FC = () => {
         </Button>
       </div>
       {/* 弹窗内容 */}
-      {expand &&
+      {expand && basicData !== null &&
         <div className={styles.content}>
-          <p>设备数量：{infos.devicesCount}</p>
+          <p>设备数量：{basicData.devicesCount}</p>
           <div className={styles.piechart}>
-            <PieChat title='设备类型：' data={deviceTypeData} />
+            <PieChat title='设备类型：' data={basicData.deviceTypeData} />
           </div>
           <div className={styles.piechart}>
-            <PieChat title='设备在线率：' data={onlineRatioData} />
+            <PieChat title='设备在线率：' data={basicData.onlineRatioData} />
           </div>
-          <p>设备消息：{infos.deviceMsgCount}</p>
-          <p>设备报错：{infos.deviceErrorCount}</p>
         </div>
       }
     </div>

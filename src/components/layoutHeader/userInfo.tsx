@@ -1,7 +1,7 @@
 import React from 'react'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Modal, Popconfirm } from 'antd'
-import { useAppSelector } from '@/hooks/reduxHooks'
+import { useStorage } from '@/hooks/storageHooks'
 
 interface UserInfoProps {
   show: boolean
@@ -14,7 +14,10 @@ const UserInfo: React.FC<UserInfoProps> = ({
   setShow,
   handleLogout
 }) => {
-  const { username } = useAppSelector(state => state.user)
+  const storage = useStorage()
+
+  const username = storage.get('user')
+  const company = storage.get('company')
 
   // DOM
   return (
@@ -43,7 +46,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
       ]}
     >
       <p>用户名：{username}</p>
-      <p>组织：杭州电子科技大学</p>
+      <p>组织：{company}</p>
     </Modal>
   )
 }

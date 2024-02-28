@@ -1,20 +1,28 @@
 import React, { useMemo, useState } from 'react'
 import { Button } from 'antd'
-import { useAppSelector } from '@/hooks/reduxHooks'
 import useImageUrl from '@/hooks/useImgHooks'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import UserInfo from './userInfo'
 import RangeSelector from '../rangeSelector'
+import { useStorage } from '@/hooks/storageHooks'
 
 const App: React.FC = () => {
   const imageUrl = useImageUrl()
   const location = useLocation()
+  const navigate = useNavigate()
+  const storage = useStorage()
+
   const pathname = useMemo(() => (location.pathname), [location.pathname])
 
   const [showUserInfo, setShowUserInfo] = useState(false) // 展开用户信息
-  const { username } = useAppSelector(state => state.user)
+  const username = storage.get('user')
+
   // 退出登录
   const handleLogout = (): void => {
+    storage.set('token', '')
+    storage.set('user', '')
+    storage.set('company', '')
+    navigate('/login')
     setShowUserInfo(false)
   }
 
@@ -48,7 +56,7 @@ const App: React.FC = () => {
                   fontSize: 24,
                   marginTop: 7
                 }}
-              >{username}xxx</h3>
+              >{username}</h3>
             </Button>
             <UserInfo
               show={showUserInfo}

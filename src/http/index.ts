@@ -1,62 +1,71 @@
-import axios, { type AxiosRequestConfig } from 'axios'
-// import { useStorage } from '@/hooks/storageHooks'
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
+import { useStorage } from '@/hooks/storageHooks'
 import qs from 'query-string'
 
-// const storage = useStorage()
+const storage = useStorage()
 
-const baseURL = '/IotPlatform' // 服务地址
-axios.defaults.timeout = 6000 // 超时时间
+// 服务地址
+const baseURL = '/api/IotPlatform'
+
+// 设置请求超时时间为 6000 毫秒
+axios.defaults.timeout = 6000
 
 // 创建请求实例
 const requestInstance = axios.create({
   baseURL,
-  // headers: { access_token: storage.get('token') },
-  headers: { access_token: '21y7t8y42174' },
-  withCredentials: true // 跨域
+  headers: { access_token: storage.get('token') } // 设置请求头中的 access_token
 })
 
-// 封装请求方法
+/**
+ * 封装请求方法
+ * @param {AxiosRequestConfig<D>} config 请求配置
+ * @returns {Promise<T>} 请求结果的 Promise
+ */
 async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Promise<T> {
   return await new Promise((resolve, reject) => {
     const { ...restConfig } = config
+
+    // 发送请求
     requestInstance.request({
       ...restConfig,
-      // GET参数序列化
+      // GET 参数序列化
       paramsSerializer (params: any): string {
         return qs.stringify(params)
       }
     }).then((res) => {
+      // 如果请求成功，则 resolve 结果
       if (res.status >= 200 && res.status < 300) {
-        console.log(res)
-        // if (rawResponse) {
-        //   resolve(resp.data)
-        // }
-        // if (resp.data?.status === true) {
-        //   resolve(resp.data.data)
-        // }
-        // if (typeof resp.data !== 'object') {
-        //   reject(new Error(resp.data))
-        // }
-      } else if (res.status === 500) {
-        reject(new Error('后端错误'))
-      } else {
-        reject(new Error('网络错误, 请稍后重试!'))
+        resolve(res.data)
       }
     }).catch((err) => {
-      console.log(err)
-      reject(new Error('网络错误, 请稍后重试!'))
-    //   if (err instanceof AxiosError) {
-    //     if (err.response?.data) {
-    //       if (typeof err.response.data !== 'object') {
-    //         reject(new Error(err.response.data))
-    //       }
-    //       reject(err.response.data)
-    //     } else {
-    //       reject(err)
-    //     }
-    //   } else {
-    //     reject(err)
-    //   }
+      // 如果请求出现错误
+      if (err instanceof AxiosError) {
+        // 处理超时错误
+        if (err.code === 'ECONNABORTED') {
+          reject(new Error('请求超时'))
+        } else if (err.response?.data !== undefined) {
+          // 处理身份验证错误
+          if (err.response.status === 401) {
+            reject(new Error('请重新登录'))
+          }
+          // 如果响应数据不是对象，则 reject 错误
+          if (typeof err.response.data !== 'object') {
+            reject(new Error(err.response.data))
+            return
+          }
+          // 否则 reject 响应数据
+          reject(err.response.data)
+        } else if (axios.isCancel(err)) {
+          // 请求被取消
+          console.log('Request canceled:', err.message)
+        } else {
+          // 其他错误情况，直接 reject
+          reject(err)
+        }
+      } else {
+        // 其他类型的错误，直接 reject
+        reject(err)
+      }
     })
   })
 }

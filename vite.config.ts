@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const baseURL = 'http://127.0.0.1:8080'
+const baseURL = 'http://localhost:8080'
 
 export default defineConfig({
   plugins: [react()],
