@@ -6,51 +6,14 @@ import ReactDOM from 'react-dom/client'
 import InfoWindow from '../components/infoWindow'
 import DeviceInfo from '../components/deviceInfo'
 import DeviceDetail from '../components/deviceDetail'
-import { Form, Input, Modal, Select } from 'antd'
-import { useLocation } from 'react-router-dom'
-
-//   测试数据
-const testData = [
-  {
-    id: 0,
-    type: 'Camera',
-    location: {
-      latitude: 30.312749138738265,
-      longitude: 120.34544347319752
-    },
-    name: '1'
-  },
-  {
-    id: 1,
-    type: 'airConditioner',
-    location: {
-      latitude: 30.3146385735457,
-      longitude: 120.3427934506908
-    },
-    name: '2'
-  },
-  {
-    id: 2,
-    type: 'lightSensor',
-    location: {
-      latitude: 30.312323084679694,
-      longitude: 120.34167765174061
-    },
-    name: '3'
-  }
-]
-
-interface markType {
-  id: number
-  type: string
-  location: {
-    latitude: number
-    longitude: number
-  }
-  name: string
-}
+import { Form, Input, Modal, Select, message } from 'antd'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { AllDevicesAPI, AddDeviceAPI } from '../api'
+import { type markType } from '../type'
 
 const MapContainer: React.FC = () => {
+  const navigate = useNavigate()
+
   // 控制地图隐藏
   const url = useLocation()
   const hidden = useMemo(() => (url.pathname !== '/home'), [url.pathname])
@@ -66,7 +29,20 @@ const MapContainer: React.FC = () => {
 
   const [showDevice, setShowDevice] = useState<null | number>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [markData, setMarkData] = useState(testData)
+  const [markData, setMarkData] = useState<markType[] | null>(null)
+
+  const getAllDevices = (): void => {
+    AllDevicesAPI()
+      .then(data => {
+        setMarkData(data)
+      })
+      .catch((err) => {
+        void message.error(err.message)
+        if (err.message === '请重新登录') {
+          navigate('/login')
+        }
+      })
+  }
 
   // 弹窗控制
   const handleOk = (): void => {
@@ -127,20 +103,32 @@ const MapContainer: React.FC = () => {
 
   // 添加设备
   const addDevice = (type: string, name: string): void => {
-    const arr = markData
-    arr.push({
-      id: 2,
+    // const arr = markData
+    // arr.push({
+    //   id: 2,
+    //   type,
+    //   location: locationRef.current,
+    //   name
+    // })
+    // setMarkData(arr)
+    // addMarker({
+    //   id: 2,
+    //   type,
+    //   location: locationRef.current,
+    //   name
+    // })
+    AddDeviceAPI({
+      name,
       type,
-      location: locationRef.current,
-      name
+      location: locationRef.current
     })
-    setMarkData(arr)
-    addMarker({
-      id: 2,
-      type,
-      location: locationRef.current,
-      name
-    })
+      .then((res) => {
+        void message.success(res)
+        getAllDevices()
+      })
+      .catch((err) => {
+        void message.error(err.message)
+      })
   }
 
   // 初始化地图
@@ -159,8 +147,6 @@ const MapContainer: React.FC = () => {
           zoom: 17, // 地图比例尺
           center: [120.34332989249378, 30.314101385002868] // 初始化地图中心点位置
         })
-        // 标记点实例列表
-        markData.forEach(item => { addMarker(item) })
         // 右键添加设备
         mapInstanceRef.current.on('rightclick', (e: any) => {
           locationRef.current = {
@@ -175,13 +161,20 @@ const MapContainer: React.FC = () => {
       })
   }
 
-  // 判断是否隐藏地图
+  // 初始化
   useEffect(() => {
-    // 初始化
+    // 判断是否隐藏地图
     if (!hidden) {
       initMap()
+      getAllDevices()
     }
   }, [hidden])
+
+  useEffect(() => {
+    if (markData !== null) {
+      markData.forEach(item => { addMarker(item) })
+    }
+  }, [markData])
 
   // 销毁地图
   useEffect(() => {
