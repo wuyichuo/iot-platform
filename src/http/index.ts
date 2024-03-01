@@ -12,8 +12,7 @@ axios.defaults.timeout = 6000
 
 // 创建请求实例
 const requestInstance = axios.create({
-  baseURL,
-  headers: { access_token: storage.get('token') } // 设置请求头中的 access_token
+  baseURL
 })
 
 /**
@@ -22,12 +21,22 @@ const requestInstance = axios.create({
  * @returns {Promise<T>} 请求结果的 Promise
  */
 async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Promise<T> {
+  const token = storage.get('token')
+
+  if (token === null && config.url !== '/public_key' && config.url !== '/login') {
+    throw new Error('请登录')
+  }
+
   return await new Promise((resolve, reject) => {
     const { ...restConfig } = config
 
     // 发送请求
     requestInstance.request({
       ...restConfig,
+      headers: {
+        ...restConfig.headers,
+        access_token: token // 将 token 添加到请求头中
+      },
       // GET 参数序列化
       paramsSerializer (params: any): string {
         return qs.stringify(params)
@@ -46,7 +55,7 @@ async function MyRequest<T = any, D = any> (config: AxiosRequestConfig<D>): Prom
         } else if (err.response?.data !== undefined) {
           // 处理身份验证错误
           if (err.response.status === 401) {
-            reject(new Error('请重新登录'))
+            reject(new Error('请登录'))
           }
           // 如果响应数据不是对象，则 reject 错误
           if (typeof err.response.data !== 'object') {
@@ -79,8 +88,8 @@ MyRequest.post = async <T = any>(url: string, data?: any, config?: AxiosRequestC
   return await MyRequest<T>({ ...config, method: 'post', url, data })
 }
 
-MyRequest.delete = async <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
-  return await MyRequest<T>({ ...config, method: 'delete', url })
+MyRequest.delete = async <T = any>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> => {
+  return await MyRequest<T>({ ...config, method: 'delete', url, params })
 }
 
 export { MyRequest }
