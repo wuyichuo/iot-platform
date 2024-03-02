@@ -4,7 +4,7 @@ import useImageUrl from '@/hooks/useImgHooks'
 import styles from './styles.module.css'
 import { FloatButton } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import DeviceDetail from '../components/deviceDetail'
+// import DeviceDetail from '../components/deviceDetail'
 import ModalForm from '../components/modalForm'
 import { type submitData, type markType } from './type'
 
@@ -136,10 +136,10 @@ const PhoneMap: React.FC = () => {
         style={{ width: '100%', height: '100%' }}
       ></div>
       {showDevice !== null && <div className={styles.deviceWindow}>
-        <DeviceDetail
+        {/* <DeviceDetail
           id={showDevice}
           close={() => { setShowDevice(null) }}
-        />
+        /> */}
       </div>}
       <FloatButton
         icon={<PlusOutlined />}

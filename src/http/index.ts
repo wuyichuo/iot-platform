@@ -5,7 +5,7 @@ import qs from 'query-string'
 const storage = useStorage()
 
 // 服务地址
-const baseURL = '/api/IotPlatform'
+const baseURL = '/IotPlatform'
 
 // 设置请求超时时间为 6000 毫秒
 axios.defaults.timeout = 6000

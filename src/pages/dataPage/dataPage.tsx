@@ -133,7 +133,7 @@ const dataPage: React.FC = () => {
         <div style={{ minHeight: 500 }}>
           {layout !== null &&
             <Screen layout={layout} isEditing={true} changeLayout={setLayout}>
-              {devices.map((e, i) => (
+              {devices.map((e) => (
                 <div key={e.id}>
                   <div className={styles.chartBoxEdit}>
                     <h2>{e.name}</h2>

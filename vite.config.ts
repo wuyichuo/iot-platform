@@ -16,10 +16,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '/IotPlatform': {
         target: baseURL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/IotPlatform/, '/IotPlatform'),
       },
     },
   },
