@@ -1,5 +1,5 @@
 import { MyRequest } from '@/http'
-import { type addDeviceProps } from './type'
+import { type OperateDeviceProps, type addDeviceProps } from './type'
 
 const BasicDataAPI = async (): Promise<any> => (
   await MyRequest.get('/basicData')
@@ -17,4 +17,20 @@ const AddDeviceAPI = async (props: addDeviceProps): Promise<any> => (
   })
 )
 
-export { BasicDataAPI, AllDevicesAPI, AddDeviceAPI }
+const DeleteDeviceAPI = async (id: number): Promise<any> => (
+  await MyRequest.delete('/deleteDevice', {
+    deviceid: id
+  })
+)
+
+const OperateDeviceAPI = async (props: OperateDeviceProps): Promise<any> => (
+  await MyRequest.post('/operateDevice', props)
+)
+
+export {
+  BasicDataAPI,
+  AllDevicesAPI,
+  AddDeviceAPI,
+  DeleteDeviceAPI,
+  OperateDeviceAPI
+}

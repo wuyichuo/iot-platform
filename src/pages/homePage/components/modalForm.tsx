@@ -84,12 +84,9 @@ const ModalForm: React.FC<ModalFormProps> = ({ isModalOpen, setIsModalOpen, subm
           >
             <Select
               options={[
-                { value: 'camera', label: '摄像头' },
                 { value: 'temperatureSensor', label: '温度传感器' },
                 { value: 'humiditySensor', label: '湿度传感器' },
-                { value: 'light', label: '灯具' },
-                { value: 'lightSensor', label: '光线传感器' },
-                { value: 'airConditioner', label: '空调' }
+                { value: 'lightSensor', label: '光线传感器' }
               ]}
             />
           </Form.Item>

@@ -1,40 +1,47 @@
 import { useEffect, useState, useRef } from 'react'
-import { FloatButton, Modal } from 'antd'
+import { FloatButton, Modal, Spin, message } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import styles from './styles.module.css'
 import useImageUrl from '@/hooks/useImgHooks'
+import { DataLayoutAPI, EditViewAPI } from './api'
 
 import Screen from './components/screen'
 import LineChat from '@/components/lineChart'
-
-// 测试数据——配置信息
-const view = [
-  { id: 'a', name: '设备数据', x: 0, y: 0, w: 1, h: 1 },
-  { id: 'b', name: '设备数据', x: 1, y: 0, w: 3, h: 1 },
-  { id: 'c', name: '设备数据', x: 4, y: 0, w: 1, h: 1 }
-]
+import { type LayoutType, type DevicesType, type ViewType } from './type'
 
 const dataPage: React.FC = () => {
   const imageUrl = useImageUrl() // 获取图片url
 
   // 页面配置
-  const [layout, setLayout] = useState(view.map(e => (
-    { i: e.id, x: e.x, y: e.y, w: e.w, h: e.h }
-  )))
-  const oldLayout = useRef(view.map(e => (
-    { i: e.id, x: e.x, y: e.y, w: e.w, h: e.h }
-  )))
+  const [layout, setLayout] = useState<LayoutType[] | null>(null)
+  const [devices, setDevices] = useState<DevicesType[]>([])
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
+  const oldLayout = useRef<LayoutType[] | null>(null)
+  const wsRef = useRef<WebSocket | null>(null)
+
   // 测试数据——图表数据
-  const [data, setData] = useState({
-    date: [1, 2, 3],
-    value: [1, 2, 3]
-  })
+  const [data, setData] = useState(null)
 
   // 关闭编辑弹窗
   const handelModalCancel = (): void => {
     setLayout(oldLayout.current)
+    setIsEditing(false)
+  }
+
+  // 保存布局
+  const handelModalOK = (): void => {
+    // API
+    if (devices.length !== 0 && layout !== null) {
+      EditViewAPI({
+        devices,
+        layout
+      })
+        .catch((err) => {
+          void message.error(err.message)
+          setLayout(oldLayout.current)
+        })
+    }
     setIsEditing(false)
   }
 
@@ -44,20 +51,66 @@ const dataPage: React.FC = () => {
     setIsEditing(true)
   }
 
+  const getDataLayout = (): void => {
+    DataLayoutAPI()
+      .then(view => {
+        setLayout(view.map((e: ViewType) => e.layout))
+        setDevices(view.map((e: ViewType) => ({
+          id: e.id,
+          name: e.name
+        })))
+        if (wsRef.current === null) {
+          const arr = view?.map((e: ViewType) => e.id)
+          OpenSocket(arr)
+        }
+      })
+      .catch((err) => {
+        void message.error(err.message)
+      })
+  }
+
+  // WebSocket
+  const OpenSocket = (idArr: number[]): void => {
+    const ws = new WebSocket('ws://localhost:5000')
+    wsRef.current = ws
+    ws.onopen = function () {
+      ws.send(JSON.stringify(idArr))
+    }
+    ws.onmessage = function (event: { data: any }) {
+      setData(JSON.parse(event.data).data)
+    }
+    ws.onclose = function () {
+      console.log('Disconnected from server')
+    }
+  }
+
   // 关闭sokect链接
   useEffect(() => {
+    getDataLayout()
+    // 组件卸载时关闭WebSocket连接
     return () => {
+      wsRef.current?.close()
     }
   }, [])
 
   // DOM
   return (
     <>
-      {!isEditing &&
+      <Spin
+        tip="Loading"
+        size="large"
+        spinning={data === null}
+        style={{
+          top: 300
+        }}
+      >
+        <div className="content" />
+      </Spin>
+      {!isEditing && layout !== null && data !== null &&
         <Screen layout={layout} isEditing={false} changeLayout={setLayout}>
-          {view.map(e => (
+          {devices.map((e, i) => (
             <div key={e.id} className={styles.chartBox}>
-              <LineChat title={e.name} data={data}/>
+              <LineChat title={e.name} data={data[i]}/>
             </div>
           ))}
         </Screen>
@@ -72,22 +125,24 @@ const dataPage: React.FC = () => {
         title="编辑视图"
         open={isEditing}
         width="95%"
-        onOk={() => { setIsEditing(false) }}
+        onOk={handelModalOK}
         onCancel={handelModalCancel}
         okText='保存'
         cancelText='取消'
       >
         <div style={{ minHeight: 500 }}>
-          <Screen layout={layout} isEditing={true} changeLayout={setLayout}>
-            {view.map(e => (
-              <div key={e.id}>
-                <div className={styles.chartBoxEdit}>
-                  <h2>{e.name}</h2>
-                  <img src={imageUrl.getUrl('images/chartImg.png')} width='100%' height='80%'/>
+          {layout !== null &&
+            <Screen layout={layout} isEditing={true} changeLayout={setLayout}>
+              {devices.map((e, i) => (
+                <div key={e.id}>
+                  <div className={styles.chartBoxEdit}>
+                    <h2>{e.name}</h2>
+                    <img src={imageUrl.getUrl('images/chartImg.png')} width='100%' height='80%'/>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </Screen>
+              ))}
+            </Screen>
+          }
         </div>
       </Modal>
     </>

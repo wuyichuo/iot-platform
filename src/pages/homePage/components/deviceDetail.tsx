@@ -1,53 +1,98 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from '../styles.module.css'
-import { Button } from 'antd'
+import { Button, Switch, message } from 'antd'
 import { CloseSquareOutlined } from '@ant-design/icons'
 import LineChat from '@/components/lineChart'
-import RangeSelector from '@/components/rangeSelector'
+import { DeleteDeviceAPI, OperateDeviceAPI } from '../api'
+import { type deviceDetailProps } from '../type'
 
-// 测试数据
-const info = {
-  name: 'name',
-  id: 40,
-  type: 'type',
-  dataURL: 'http://jasfikua',
-  location: {
-    latitude: 0,
-    longitude: 0
+// 设备类型翻译函数
+const translateDeviceType = (type: string | undefined): string => {
+  switch (type) {
+    case 'temperatureSensor':
+      return '温度计'
+    case 'humiditySensor':
+      return '湿度计'
+    case 'lightSensor':
+      return '光线传感器'
+    default:
+      return ''
   }
-}
-
-interface deviceDetailProps {
-  id: number | null
-  close: () => void
 }
 
 const deviceDetail: React.FC<deviceDetailProps> = (props) => {
   const [data, setData] = useState({
-    date: [1, 2, 3],
-    value: [1, 2, 3]
+    date: [],
+    value: []
   })
+  const [deviceState, setDeviceState] = useState('在线')
+
+  const deleteDevice = (): void => {
+    if (props.device !== null) {
+      DeleteDeviceAPI(props.device?.id)
+        .then(() => {
+          props.afterDelete()
+          void message.success('已删除')
+        })
+        .catch((err) => {
+          void message.error(err.message)
+        })
+    }
+  }
+
+  const changeDeviceState = (checked: boolean): void => {
+    const msg = checked ? '已开启' : '已关闭'
+    if (props.device !== null) {
+      OperateDeviceAPI({
+        deviceId: props.device.id,
+        open: checked
+      })
+        .then(() => {
+          getDeviceDetail()
+          void message.success(msg)
+        })
+        .catch(err => {
+          void message.error(err.message)
+        })
+    }
+  }
+
+  const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    // 动态数据测试
-    // const newData = { ...data }
-    // setInterval(function () {
-    //   newData.date.shift()
-    //   newData.date.push(newData.date[newData.date.length - 1] + 1)
-    //   newData.value.shift()
-    //   newData.value.push(newData.value[newData.value.length - 1] + 1)
-    //   setData(newData)
-    // }, 500)
+    // WebSocket
+    const ws = new WebSocket('ws://localhost:5000')
+    wsRef.current = ws
 
-    // // api测试
-    // MyRequest.get('./test.json')
-    //   .then(responseData => {
-    //     console.log('GET 请求成功:', responseData)
-    //   })
-    //   .catch(error => {
-    //     console.error('GET 请求失败:', error.message)
-    //   })
+    ws.onopen = function () {
+      ws.send(JSON.stringify([props.device?.id]))
+    }
+
+    ws.onmessage = function (event: { data: any }) {
+      setData(JSON.parse(event.data).data)
+      setDeviceState(JSON.parse(event.data).state)
+    }
+
+    ws.onclose = function () {
+      console.log('Disconnected from server')
+    }
+
+    // 组件卸载时关闭WebSocket连接
+    return () => {
+      ws.close()
+    }
   }, [])
+
+  const getDeviceDetail = (): void => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      const arr = [props.device?.id]
+      wsRef.current.send(JSON.stringify(arr))
+    }
+  }
+
+  useEffect(() => {
+    getDeviceDetail()
+  }, [props.device?.id])
 
   // DOM
   return (
@@ -63,23 +108,30 @@ const deviceDetail: React.FC<deviceDetailProps> = (props) => {
         </Button>
       </div>
       <div className={styles.content}>
-        <p>设备ID：{props.id}</p>
-        <p>设备名称：{info.name}</p>
-        <p>设备类型：{info.type}</p>
-        <text>数据范围：</text><RangeSelector size='small'/>
+        <p>设备ID：{props.device?.id}</p>
+        <p>设备名称：{props.device?.name}</p>
+        <p>设备类型：{translateDeviceType(props.device?.type)}</p>
+        {/* <text>数据范围：</text><RangeSelector size='small'/> */}
+        <p>
+          设备状态：
+          <Switch
+            checked={deviceState === '在线'}
+            checkedChildren="在线"
+            unCheckedChildren="离线"
+            onChange={changeDeviceState}
+          />
+        </p>
         <div className={styles.piechart}>
-          <LineChat title='设备数据：' data={data} />
+          <LineChat title='设备数据(后端模拟)：' data={data} />
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around'
-          }}>
-          <Button type='primary' >启动</Button>
-          <Button type='primary' >关闭</Button>
-          <Button type='primary' >删除</Button>
-        </div>
+        <Button
+          size='large'
+          type='primary'
+          onClick={deleteDevice}
+          style={{ width: '100%' }}
+        >
+          删除
+        </Button>
       </div>
     </div>
   )

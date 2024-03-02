@@ -3,7 +3,7 @@ import { Button } from 'antd'
 import useImageUrl from '@/hooks/useImgHooks'
 import { useLocation, useNavigate } from 'react-router-dom'
 import UserInfo from './userInfo'
-import RangeSelector from '../rangeSelector'
+// import RangeSelector from '../rangeSelector'
 import { useStorage } from '@/hooks/storageHooks'
 
 const App: React.FC = () => {
@@ -37,9 +37,9 @@ const App: React.FC = () => {
         }}
       >物联网平台</h1>
       <div style={{ display: 'inline-flex', position: 'absolute', right: 50 }}>
-        {(pathname === '/home')
+        {(pathname === '/home') &&
           // 用户信息
-          ? <>
+          <>
             <img
               src={imageUrl.getUrl('/images/head.png')}
               style={{
@@ -64,7 +64,7 @@ const App: React.FC = () => {
               handleLogout={handleLogout}
             />
           </>
-          : <RangeSelector size={'middle'}/>
+          // : <RangeSelector size={'middle'}/>
         }
       </div>
     </>

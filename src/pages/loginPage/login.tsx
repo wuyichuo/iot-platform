@@ -28,7 +28,7 @@ const App: React.FC = () => {
       storage.set('company', res.company)
       storage.set('user', username)
     } catch (error) {
-      await Promise.reject(error) // 将错误包装在一个拒绝状态的 promise 中
+      await Promise.reject(error)
     }
   }
 

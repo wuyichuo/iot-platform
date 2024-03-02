@@ -27,7 +27,7 @@ const MapContainer: React.FC = () => {
 
   const [form] = Form.useForm()
 
-  const [showDevice, setShowDevice] = useState<null | number>(null)
+  const [showDevice, setShowDevice] = useState<null | markType>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [markData, setMarkData] = useState<markType[] | null>(null)
 
@@ -91,7 +91,7 @@ const MapContainer: React.FC = () => {
         })
         marker.on('mouseover', () => { Window.open(mapInstanceRef.current, position) })
         marker.on('mouseout', () => { Window.close() })
-        marker.on('click', () => { setShowDevice(device.id) })
+        marker.on('click', () => { setShowDevice(device) })
 
         // 将创建的点标记添加到已有的地图
         mapInstanceRef.current.add(marker)
@@ -103,20 +103,6 @@ const MapContainer: React.FC = () => {
 
   // 添加设备
   const addDevice = (type: string, name: string): void => {
-    // const arr = markData
-    // arr.push({
-    //   id: 2,
-    //   type,
-    //   location: locationRef.current,
-    //   name
-    // })
-    // setMarkData(arr)
-    // addMarker({
-    //   id: 2,
-    //   type,
-    //   location: locationRef.current,
-    //   name
-    // })
     AddDeviceAPI({
       name,
       type,
@@ -161,6 +147,21 @@ const MapContainer: React.FC = () => {
       })
   }
 
+  const updateMarkers = (): void => {
+    setShowDevice(null)
+    const update = async (): Promise<void> => {
+      if (mapInstanceRef.current !== null) {
+        const markers = mapInstanceRef.current.getAllOverlays('marker')
+        await markers.forEach((marker: any) => {
+          mapInstanceRef.current.remove(marker)
+        })
+        getAllDevices()
+      }
+    }
+    update()
+      .catch(err => { console.log(err) })
+  }
+
   // 初始化
   useEffect(() => {
     // 判断是否隐藏地图
@@ -195,9 +196,13 @@ const MapContainer: React.FC = () => {
       <div className={styles.infoWindow}>
           <InfoWindow />
       </div>
-      {showDevice !== null && <div className={styles.deviceWindow}>
-          <DeviceDetail id={showDevice} close={() => { setShowDevice(null) }}/>
-      </div>}
+      {showDevice !== null &&
+        <div className={styles.deviceWindow}>
+          <DeviceDetail
+            device={showDevice}
+            close={() => { setShowDevice(null) }}
+            afterDelete ={updateMarkers}/>
+        </div>}
       <Modal title="添加设备" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
         <Form
           form={form}
@@ -218,12 +223,9 @@ const MapContainer: React.FC = () => {
           >
             <Select
               options={[
-                { value: 'camera', label: '摄像头' },
                 { value: 'temperatureSensor', label: '温度传感器' },
                 { value: 'humiditySensor', label: '湿度传感器' },
-                { value: 'light', label: '灯具' },
-                { value: 'lightSensor', label: '光线传感器' },
-                { value: 'airConditioner', label: '空调' }
+                { value: 'lightSensor', label: '光线传感器' }
               ]}
             />
           </Form.Item>

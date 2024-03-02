@@ -9,18 +9,12 @@ interface DeviceInfoProps {
 // 设备类型翻译函数
 const translateDeviceType = (type: string): string => {
   switch (type) {
-    case 'camera':
-      return '摄像头'
     case 'temperatureSensor':
       return '温度计'
     case 'humiditySensor':
       return '湿度计'
     case 'lightSensor':
       return '光线传感器'
-    case 'light':
-      return '灯'
-    case 'airConditioner':
-      return '空调'
     default:
       return type
   }
