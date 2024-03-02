@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import AMapLoader from '@amap/amap-jsapi-loader'
-import useImageUrl from '@/hooks/useImgHooks'
+// import useImageUrl from '@/hooks/useImgHooks'
 import styles from '../styles.module.css'
 import ReactDOM from 'react-dom/client'
 import InfoWindow from '../components/infoWindow'
@@ -10,6 +10,11 @@ import { Form, Input, Modal, Select, message } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AllDevicesAPI, AddDeviceAPI } from '../api'
 import { type markType } from '../type'
+
+import TemperatureSensorImg from '@/assets/icons/TemperatureSensor.svg'
+import defaultImg from '@/assets/icons/default.svg'
+import humiditySensorImg from '@/assets/icons/humiditySensor.svg'
+import lightSensorImg from '@/assets/icons/lightSensor.svg'
 
 const MapContainer: React.FC = () => {
   const navigate = useNavigate()
@@ -23,7 +28,7 @@ const MapContainer: React.FC = () => {
     latitude: 0,
     longitude: 0
   })
-  const imageUrl = useImageUrl() // 获取图片url
+  // const imageUrl = useImageUrl() // 获取图片url
 
   const [form] = Form.useForm()
 
@@ -62,6 +67,21 @@ const MapContainer: React.FC = () => {
 
   // 添加标记点
   const addMarker = (device: markType): void => {
+    let iconImg: string
+    switch (device.type) {
+      case 'lightSensor':
+        iconImg = lightSensorImg
+        break
+      case 'temperatureSensor':
+        iconImg = TemperatureSensorImg
+        break
+      case 'humiditySensor':
+        iconImg = humiditySensorImg
+        break
+      default:
+        iconImg = defaultImg
+        break
+    }
     AMapLoader.load({
       key: import.meta.env.VITE_APP_AMAP_KEY, // 高德地图Web端开发者Key
       version: '2.0',
@@ -71,7 +91,7 @@ const MapContainer: React.FC = () => {
         // 创建自定义图标
         const icon = new AMap.Icon({
           size: new AMap.Size(40, 40), // 图标尺寸
-          image: imageUrl.getUrl(`icons/${device.type}.svg`), // Icon的图像
+          image: iconImg, // Icon的图像
           imageSize: new AMap.Size(40, 40) // 压缩图片的尺寸
         })
 

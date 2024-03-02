@@ -2,15 +2,16 @@ import { useEffect, useState, useRef } from 'react'
 import { FloatButton, Modal, Spin, message } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import styles from './styles.module.css'
-import useImageUrl from '@/hooks/useImgHooks'
+// import useImageUrl from '@/hooks/useImgHooks'
 import { DataLayoutAPI, EditViewAPI } from './api'
+import chartImg from '@/assets/images/chartImg.png'
 
 import Screen from './components/screen'
 import LineChat from '@/components/lineChart'
 import { type LayoutType, type DevicesType, type ViewType } from './type'
 
 const dataPage: React.FC = () => {
-  const imageUrl = useImageUrl() // 获取图片url
+  // const imageUrl = useImageUrl() // 获取图片url
 
   // 页面配置
   const [layout, setLayout] = useState<LayoutType[] | null>(null)
@@ -137,7 +138,7 @@ const dataPage: React.FC = () => {
                 <div key={e.id}>
                   <div className={styles.chartBoxEdit}>
                     <h2>{e.name}</h2>
-                    <img src={imageUrl.getUrl('images/chartImg.png')} width='100%' height='80%'/>
+                    <img src={chartImg} width='100%' height='80%'/>
                   </div>
                 </div>
               ))}

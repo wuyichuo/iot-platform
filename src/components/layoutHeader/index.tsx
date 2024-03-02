@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react'
 import { Button } from 'antd'
-import useImageUrl from '@/hooks/useImgHooks'
+import headImg from '@/assets/images/head.png'
+// import useImageUrl from '@/hooks/useImgHooks'
 import { useLocation, useNavigate } from 'react-router-dom'
 import UserInfo from './userInfo'
 // import RangeSelector from '../rangeSelector'
 import { useStorage } from '@/hooks/storageHooks'
 
 const App: React.FC = () => {
-  const imageUrl = useImageUrl()
+  // const imageUrl = useImageUrl()
   const location = useLocation()
   const navigate = useNavigate()
   const storage = useStorage()
@@ -41,7 +42,7 @@ const App: React.FC = () => {
           // 用户信息
           <>
             <img
-              src={imageUrl.getUrl('/images/head.png')}
+              src={headImg}
               style={{
                 width: 50,
                 height: 50,
